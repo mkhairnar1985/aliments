@@ -9,12 +9,16 @@
 }
 
     .menu a {
-        background-color: #e5e5e5;
-        padding: 8px;
+        text-transform: capitalize;       
+        background-color:  darkslategray;
+        color: wheat;
+        padding: 15px 25px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
         margin-top: 7px;
         display: block;
         width: 100%;
-        color: black;
     }
 
 .main {
@@ -35,6 +39,16 @@
 .responsive {
     width: 100%;
     height: auto;
+}
+
+.wa {
+    background-color: mediumseagreen;
+    color: white;
+    padding: 15px 25px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 10px;
 }
 
 #container {
