@@ -1,59 +1,163 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Aliments</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="aliments.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aliments - Fresh Cloud Kitchen</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Custom CSS File -->
+    <link rel="stylesheet" href="style.css">
 </head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-D7VV8K3R48"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+<body class="bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col selection:bg-emerald-500 selection:text-white">
 
-  gtag('config', 'G-D7VV8K3R48');
-</script>    
-<body>
-    <div style="background-color:#e5e5e5;padding:15px;text-align:center;">
-        <h1>Aliments</h1>
-    </div>
+    <!-- Navbar -->
+    <header class="bg-white/80 backdrop-blur-md border-b border-slate-100 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-emerald-600 to-teal-500 text-white p-2.5 rounded-2xl font-bold shadow-lg shadow-emerald-500/20 flex items-center justify-center w-10 h-10">
+                    <i class="fa-solid fa-utensils text-sm"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-extrabold tracking-tight text-slate-900 leading-none">Aliments<span class="text-emerald-600">.</span></h1>
+                    <p class="text-[10px] font-semibold text-slate-400 tracking-wide uppercase mt-0.5">Cloud Kitchen</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div id="headerAdminLink" class="hidden">
+                    <a href="?admin=true" class="px-3 py-2 text-xs font-bold rounded-xl bg-slate-900 text-white transition hover:bg-slate-800 shadow-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-gauge text-emerald-400"></i> Admin Panel
+                    </a>
+                </div>
+                <!-- Dynamic Kitchen Status Badge -->
+                <div id="kitchenStatusBadge" class="px-3 py-1.5 rounded-xl text-xs font-bold border flex items-center gap-1.5 shadow-2xl transition-all duration-300">
+                    <span id="kitchenDot" class="w-2 h-2 rounded-full"></span> 
+                    <span id="kitchenText">Checking status...</span>
+                </div>
+            </div>
+        </div>
+    </header>
 
-    <div style="overflow:auto">
-        <div class="menu">
-            <a href="#">Diwali faral</a>
-            <a href="#">Weekend breakfast</a>
-            <a href="#">Catering services</a>
-            <a href="#">Learn to cook</a>
-            <div id=container>
-                Make Your
-                    <div id=flip>
-                        <div><div>Food</div></div>
-                        <div><div>Mood</div></div>
-                        <div><div>Life</div></div>
-                    </div>
-                AweSoMe!
+    <!-- Main Wrapper -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex-grow w-full space-y-8">
+        
+        <!-- Hero Banner -->
+        <div class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-emerald-950 to-teal-950 text-white p-8 sm:p-10 rounded-3xl shadow-xl flex flex-col md:flex-row justify-between items-center gap-6 border border-slate-800">
+            <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="space-y-3 z-10 max-w-xl">
+                <span class="inline-flex items-center gap-1.5 bg-emerald-500/20 text-emerald-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-emerald-400/20">
+                    <i class="fa-solid fa-bolt text-[10px]"></i> Direct WhatsApp Checkout
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-black tracking-tight leading-tight">Fresh, Healthy Meals Delivered to Your Door.</h2>
+                <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">Prepared fresh daily with premium ingredients. Scan the UPI QR, pay securely with 0% fees, and dispatch your order instantly.</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md p-5 rounded-2xl border border-white/15 text-center min-w-[200px] shadow-lg z-10">
+                <p class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Basket Total</p>
+                <p id="heroCartTotal" class="text-3xl font-black text-emerald-400 mt-1">₹0</p>
+                <p class="text-[10px] text-slate-400 mt-1">Instant WhatsApp Sync</p>
             </div>
         </div>
 
-        <div class="main">
-            <h2>Hello Sweety</h2>
-            <p>Here is your breakfast for today</p>
-            <picture>
-                <img src="breakfast.jpeg" class="responsive"">
-            </picture>
+        <!-- Category Filter Pills -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+            <button onclick="filterCategory('All')" id="cat-All" class="cat-btn px-4 py-2.5 rounded-2xl text-xs font-bold bg-emerald-600 text-white shadow-md shadow-emerald-600/20 transition whitespace-nowrap">All Items</button>
+            <button onclick="filterCategory('Meals')" id="cat-Meals" class="cat-btn px-4 py-2.5 rounded-2xl text-xs font-bold bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50 transition whitespace-nowrap">🥗 Meals</button>
+            <button onclick="filterCategory('Snacks')" id="cat-Snacks" class="cat-btn px-4 py-2.5 rounded-2xl text-xs font-bold bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50 transition whitespace-nowrap">🥪 Snacks</button>
+            <button onclick="filterCategory('Drinks')" id="cat-Drinks" class="cat-btn px-4 py-2.5 rounded-2xl text-xs font-bold bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50 transition whitespace-nowrap">🥤 Drinks</button>
+            <button onclick="filterCategory('Breakfast')" id="cat-Breakfast" class="cat-btn px-4 py-2.5 rounded-2xl text-xs font-bold bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50 transition whitespace-nowrap">🥣 Breakfast</button>
         </div>
 
-        <div class="right">
-            <h2>About</h2>
-            <p>We provide home made food with best quality ingredients</p>
-            <a class="wa" href="https://wa.me/919870640164">
-                Chat on WhatsApp
-            </a>
+        <!-- Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- Menu Section (8 Cols) -->
+            <div class="lg:col-span-7 xl:col-span-8 space-y-4">
+                <div class="flex justify-between items-center px-1">
+                    <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-fire text-emerald-600"></i> Explore Menu
+                    </h3>
+                    <span id="menuStatus" class="text-xs font-medium text-slate-400">Syncing database...</span>
+                </div>
+                <div id="menuGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <!-- Dynamic Cloud Items -->
+                </div>
+            </div>
+
+            <!-- Sticky Cart & Checkout Sidebar (5 Cols) -->
+            <div class="lg:col-span-5 xl:col-span-4 bg-white p-6 rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50 sticky top-24 space-y-5">
+                <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+                    <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-basket-shopping text-emerald-600"></i> Order Summary
+                    </h3>
+                    <span id="cartCountBadge" class="text-xs font-bold bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full border border-emerald-100">0 items</span>
+                </div>
+                
+                <!-- Cart Items Box -->
+                <div id="cartItemsList" class="divide-y divide-slate-100 max-h-48 overflow-y-auto space-y-1 pr-1">
+                    <div class="text-center py-6 text-slate-400">
+                        <i class="fa-solid fa-cart-flatbed text-2xl mb-2 text-slate-300"></i>
+                        <p class="text-xs">Your basket is empty. Add items to begin.</p>
+                    </div>
+                </div>
+
+                <!-- Bill Totals & QR -->
+                <div class="border-t border-slate-100 pt-4 space-y-4">
+                    <div class="flex justify-between text-sm font-extrabold text-slate-900">
+                        <span>Total Payable:</span>
+                        <span id="cartTotalSum" class="text-emerald-600 text-lg">₹0</span>
+                    </div>
+
+                    <!-- UPI QR Card -->
+                    <div class="bg-emerald-50/50 p-4 rounded-2xl border border-emerald-100 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-emerald-900">Scan & Pay via UPI</span>
+                            <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">Zero Fees</span>
+                        </div>
+                        <div class="text-center bg-white p-3 rounded-2xl border border-emerald-200/60 shadow-2xs inline-block mx-auto w-full">
+                            <img id="upiQRCode" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=yourbusiness@okhdfcbank&pn=Aliments&am=0" alt="UPI QR" class="mx-auto w-28 h-28 object-contain rounded-lg">
+                            <p class="text-[10px] font-mono font-bold text-slate-600 mt-2 truncate">VPA: <span class="text-emerald-600">yourbusiness@okhdfcbank</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Checkout Form Inputs -->
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Your Full Name</label>
+                            <input type="text" id="custName" placeholder="e.g. Makarand Khairnar" class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 focus:ring-2 focus:ring-emerald-500 focus:bg-white focus:outline-none transition font-medium">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Delivery Address / Room</label>
+                            <input type="text" id="custAddress" placeholder="e.g. Flat / Building Name" class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 focus:ring-2 focus:ring-emerald-500 focus:bg-white focus:outline-none transition font-medium">
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">UPI Transaction Ref (UTR / Txn ID)</label>
+                            <input type="text" id="payRef" placeholder="12-digit UTR after payment" class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 font-mono focus:ring-2 focus:ring-emerald-500 focus:bg-white focus:outline-none transition">
+                            <p class="text-[10px] text-slate-400 mt-1">Required for instant payment verification.</p>
+                        </div>
+                    </div>
+
+                    <button id="checkoutBtn" onclick="window.submitOrderToCloud()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold py-3.5 rounded-2xl transition duration-200 text-xs shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2">
+                        <i class="fa-brands fa-whatsapp text-base"></i> Place Order via WhatsApp
+                    </button>
+                </div>
+            </div>
+
         </div>
-    </div>
 
-    <div style="background-color:#e5e5e5;text-align:center;padding:10px;margin-top:7px;">Copyright © 2025 Aliments - All rights reserved.</div>
+    </main>
 
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-100 mt-16 py-6 text-center text-xs text-slate-400">
+        <p>&copy; 2026 Aliments.letsdoit.co.in &bull; Powered by Firebase & GitHub Pages.</p>
+    </footer>
+
+    <!-- External JavaScript File -->
+    <script type="module" src="app.js"></script>
 </body>
 </html>

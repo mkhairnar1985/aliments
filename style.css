@@ -1,0 +1,13 @@
+/* style.css */
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Hide scrollbars for clean horizontal category scrolling */
+.scrollbar-none::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
