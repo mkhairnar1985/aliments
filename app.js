@@ -2,6 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore, collection, getDocs, getDoc, doc, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+// REPLACE WITH YOUR ACTUAL FIREBASE CONFIG
 const firebaseConfig = {
             apiKey: "AIzaSyCwMm9I0OP53oGmysE3PEjgNvcBsCf5YCc",
             authDomain: "aliments-bd960.firebaseapp.com",
@@ -12,12 +13,11 @@ const firebaseConfig = {
             measurementId: "G-8E79M9ME8L"
         };
 
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const VENDOR_WHATSAPP = "919876543210"; // Replace with your WhatsApp number
-const VENDOR_UPI_ID = "yourbusiness@okhdfcbank"; // Replace with your UPI ID
+let VENDOR_WHATSAPP = "";
+let VENDOR_UPI_ID = "";
 
 let menuItems = [];
 let cart = [];
@@ -30,11 +30,58 @@ if (urlParams.get('admin') === 'true') {
 }
 
 async function initApp() {
-    await fetchKitchenStatus();
+    await fetchStoreSettings();
     await fetchMenu();
 }
 
-async function fetchKitchenStatus() {
+/**
+ * AES-128 Decryption Helper using Web Crypto API
+ * @param {string} base64EncryptedData - The ciphertext stored in Firestore (Base64 encoded)
+ * @param {string} passphrase - Your key/password stored in Firestore
+ */
+/**
+ * AES-128 Decryption using separate IV and Ciphertext Base64 strings
+ */
+async function decryptAES128(ciphertextBase64, ivBase64, passphrase) {
+    try {
+        if (!ciphertextBase64 || !passphrase) return "";
+
+        // If no separate IV is provided or it's not encrypted, return as plaintext
+        if (!ivBase64 || !/^[A-Za-z0-9+/=]+$/.test(ciphertextBase64)) {
+            return ciphertextBase64;
+        }
+
+        const enc = new TextEncoder();
+        const keyMaterial = await window.crypto.subtle.importKey(
+            "raw",
+            enc.encode(passphrase.padEnd(16, '0').slice(0, 16)), // 128-bit key
+            { name: "AES-CBC" },
+            false,
+            ["decrypt"]
+        );
+
+        // Decode IV and Ciphertext from their individual Base64 strings
+        const iv = Uint8Array.from(atob(ivBase64), c => c.charCodeAt(0));
+        const ciphertext = Uint8Array.from(atob(ciphertextBase64), c => c.charCodeAt(0));
+
+        // Perform AES-128 Decryption
+        const decryptedBuffer = await window.crypto.subtle.decrypt(
+            { name: "AES-CBC", iv: iv },
+            keyMaterial,
+            ciphertext
+        );
+
+        const decryptedResult = new TextDecoder().decode(decryptedBuffer);
+        //console.log("✅ [Decrypt] Success:", decryptedResult);
+        return decryptedResult;
+
+    } catch (error) {
+        //console.error("❌ [Decrypt] Failed, returning raw value:", error);
+        return ciphertextBase64;
+    }
+}
+
+async function fetchStoreSettings() {
     const badge = document.getElementById('kitchenStatusBadge');
     const dot = document.getElementById('kitchenDot');
     const text = document.getElementById('kitchenText');
@@ -45,9 +92,21 @@ async function fetchKitchenStatus() {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-            isKitchenOpen = docSnap.data().isKitchenOpen === true;
+            const data = docSnap.data();
+            isKitchenOpen = data.isKitchenOpen === true;
+            
+            const publicKey = data.publicKey || "";
+            const ivStr = data.iv || "";
+            const encryptedWhatsapp = data.whatsapp || "";
+            const encryptedUpi = data.upiId || "";
+
+            // Decrypt using the separate IV
+            VENDOR_WHATSAPP = await decryptAES128(encryptedWhatsapp, ivStr, publicKey);
+            VENDOR_UPI_ID = await decryptAES128(encryptedUpi, ivStr, publicKey);
         } else {
             isKitchenOpen = true; 
+            VENDOR_WHATSAPP = "919876543210"; // Fallback default
+            VENDOR_UPI_ID = "yourbusiness@okhdfcbank"; // Fallback default
         }
 
         if (isKitchenOpen) {
@@ -68,7 +127,7 @@ async function fetchKitchenStatus() {
             renderCart();
         }
     } catch (error) {
-        console.error("Error fetching kitchen status:", error);
+        console.error("Error fetching store settings:", error);
         text.textContent = "Status Error";
     }
 }
